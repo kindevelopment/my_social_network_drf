@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.db import models
 
+from comments.models import Comment
+
 
 def team_directory_path(instance, filename):
-    return f'team_avatar/team-{instance.title}/{filename}'
+    return f'team/team_avatar/team-{instance.title}/{filename}'
 
 
 class Team(models.Model):
@@ -27,7 +29,8 @@ class Team(models.Model):
     )
     subscribers = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        related_name='all_subscribers_post',
+        related_name='all_subscribers_team',
+        blank=True,
         verbose_name='Подписчики команды',
     )
 
@@ -46,20 +49,18 @@ class TeamPost(models.Model):
         null=True,
         verbose_name='Автор поста',
     )
-    title = models.CharField('Название поста')
+    title = models.CharField('Название поста', max_length=150)
     text = models.TextField('Содержимое')
-    poster = models.ImageField('Постер поста', upload_to='team_post_poster/', null=True, blank=True)
+    poster = models.ImageField('Постер поста', upload_to='team/team_post_poster/', null=True, blank=True)
     likes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name='likes_post_team',
-        null=True,
         blank=True,
         verbose_name='Лайки',
     )
     dislikes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name='dislikes_post_team',
-        null=True,
         blank=True,
         verbose_name='Дизлайки',
     )
@@ -75,7 +76,16 @@ class TeamPost(models.Model):
 
     class Meta:
         verbose_name = 'Пост команды'
-        verbose_name_plural = 'Посты команды'
+        verbose_name_plural = 'Посты команд'
+
+
+class CommentTeamPost(Comment):
+    comment_team_post = models.ForeignKey(
+        TeamPost,
+        on_delete=models.CASCADE,
+        related_name='comments_team_post',
+        verbose_name='Комментарии к посту в команде',
+    )
 
 
 class Category(models.Model):

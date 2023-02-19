@@ -5,13 +5,16 @@ from django.db import models
 class Message(models.Model):
     user_sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+
         on_delete=models.CASCADE,
         verbose_name='Отправитель',
+        related_name='user_sender_messages',
     )
     user_reciever = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name='Получатель',
+        related_name='user_reciever_messages',
     )
     text_message = models.TextField('Содержимое')
     time_send_message = models.DateTimeField('Время отправки', auto_now_add=True)
@@ -21,5 +24,5 @@ class Message(models.Model):
 
     class Meta:
         verbose_name = 'Сообщение пользователя'
-        verbose_name_plural = 'Сообщении пользователя'
+        verbose_name_plural = 'Сообщении пользователей'
 
