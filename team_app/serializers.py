@@ -30,13 +30,21 @@ class MixinFieldTeam(serializers.ModelSerializer):
 
 
 class ListTeamViewSerializers(MixinFieldTeam, serializers.ModelSerializer):
-
+    '''Вывод списком всех команд'''
     class Meta:
         model = Team
         exclude = ('user', 'about', )
 
 
+class TeamCreateSerializers(serializers.ModelSerializer):
+    '''Создание команды'''
+    class Meta:
+        model = Team
+        fields = ('title', 'about', 'avatar', 'category', 'stack', )
+
+
 class RetrieveTeamViewSerializers(MixinFieldTeam, serializers.ModelSerializer):
+    '''Вывод детально одной команды'''
     user = UserSerializers()
 
     class Meta:
@@ -45,6 +53,7 @@ class RetrieveTeamViewSerializers(MixinFieldTeam, serializers.ModelSerializer):
 
 
 class EditDestroyViewSerializers(serializers.ModelSerializer):
+    '''Изменение данных команды'''
     category = CategorySerializers()
     stack = StackSerializers(many=True)
 
@@ -54,6 +63,7 @@ class EditDestroyViewSerializers(serializers.ModelSerializer):
 
 
 class ListPostTeamViewSerializers(serializers.ModelSerializer):
+    '''Посты команды'''
     likes = UserSerializers(many=True)
     dislikes = UserSerializers(many=True)
     team_post = TeamPostFieldViewSerializers()
@@ -63,8 +73,15 @@ class ListPostTeamViewSerializers(serializers.ModelSerializer):
         fields = ('title', 'text', 'poster', 'likes', 'dislikes', 'team_post', )
 
 
-class RetrieveEditUserPostSerializers(serializers.ModelSerializer):
+class AddPostTeamSerializers(serializers.ModelSerializer):
 
+    class Meta:
+        model = TeamPost
+        fields = ('title', 'text', 'poster')
+
+
+class RetrieveEditUserPostSerializers(serializers.ModelSerializer):
+    '''Изменение и удаление поста команды'''
     class Meta:
         model = TeamPost
         exclude = ('team_post', )

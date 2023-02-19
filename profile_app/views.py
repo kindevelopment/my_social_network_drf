@@ -6,10 +6,10 @@ from rest_framework.response import Response
 from .models import User, UserPost, Subscribe
 from .serializers import (ProfileSerializers,
                           ProfileEditSerializers,
-                          UserPostViewSerializers,
+                          UserPostListSerializers,
                           UserPostRetrieveAndEdit,
                           ListUserSerializers,
-                          ProfileSubscribeSerializers,
+                          ProfileSubscribeSerializers, UserPostAddSerializers,
                           )
 from base.classes import MixedPermission
 from base.permissions import IsUser, IsUserprofile
@@ -59,10 +59,18 @@ class ProfileEditView(MixedPermission, viewsets.ModelViewSet):
 
 
 class ListUserPostView(generics.ListAPIView):
-    serializer_class = UserPostViewSerializers
+    serializer_class = UserPostListSerializers
 
     def get_queryset(self):
         return UserPost.objects.filter(user_id=self.kwargs.get('pk'))
+
+
+class UserPostAddView(generics.CreateAPIView):
+    queryset = UserPost.objects.all()
+    serializer_class = UserPostAddSerializers
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class RetrieveUserPostView(MixedPermission, viewsets.ModelViewSet):

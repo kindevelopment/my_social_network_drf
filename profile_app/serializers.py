@@ -46,11 +46,18 @@ class ProfileEditSerializers(serializers.ModelSerializer):
         fields = ('username', 'first_name', 'last_name', 'email', 'about', 'avatar', 'address', 'phone_num', 'url_github', )
 
 
-class UserPostViewSerializers(MixinFieldProfile, serializers.ModelSerializer):
+class UserPostListSerializers(MixinFieldProfile, serializers.ModelSerializer):
 
     class Meta:
         model = UserPost
         fields = ('id', 'user', 'title', 'text', 'poster', 'likes', 'dislikes', )
+
+
+class UserPostAddSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserPost
+        fields = ('title', 'text', 'poster', )
 
 
 class UserPostRetrieveAndEdit(MixinFieldProfile, serializers.ModelSerializer):

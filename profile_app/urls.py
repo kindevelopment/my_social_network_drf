@@ -4,7 +4,7 @@ from .views import (ProfileView,
                     ListUserPostView,
                     RetrieveUserPostView,
                     ListProfileView,
-                    ProfileSubscribeView, ProfileSubscribeAddDelView,
+                    ProfileSubscribeView, ProfileSubscribeAddDelView, UserPostAddView,
 
                     )
 
@@ -15,5 +15,6 @@ urlpatterns = [
     path('<int:pk>/subscribe/add_del/', ProfileSubscribeAddDelView.as_view({'get': 'retrieve', 'put': 'add_del_follower'})),
     path('<int:pk>/edit/', ProfileEditView.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
     path('<int:pk>/wall/', ListUserPostView.as_view()),
+    path('<int:pk>/wall/add_post', UserPostAddView.as_view()),
     path('<int:pk>/wall/<int:num_post>/', RetrieveUserPostView.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy',})),
 ]
