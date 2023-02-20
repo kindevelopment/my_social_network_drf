@@ -3,14 +3,18 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 
-from .models import User, UserPost, Subscribe
+from .models import User, UserPost, Subscribe, CommentUserPost
 from .serializers import (ProfileSerializers,
                           ProfileEditSerializers,
                           UserPostListSerializers,
                           UserPostRetrieveAndEdit,
                           ListUserSerializers,
-                          ProfileSubscribeSerializers, UserPostAddSerializers,
+                          ProfileSubscribeSerializers,
+                          UserPostAddSerializers,
+                          CommentsCreateUserPostSerializers, CommentsListUserPostSerializers,
+                          CommentsRetDesUpUserPostSerializers,
                           )
+
 from base.classes import MixedPermission
 from base.permissions import IsUser, IsUserprofile
 
@@ -84,3 +88,58 @@ class RetrieveUserPostView(MixedPermission, viewsets.ModelViewSet):
     lookup_url_kwarg = 'num_post'
 
 
+class AddLikesOrDislikesUserPostView(viewsets.ModelViewSet):
+    queryset = UserPost.objects.all()
+    serializer_class = UserPostRetrieveAndEdit
+    permission_classes = (IsAuthenticated, )
+    lookup_url_kwarg = 'num_post'
+
+    @action(detail=True, methods=('put', ))
+    def set_like(self, request, pk, num_post):
+        post = self.get_object()
+        print(post)
+        if self.request.user in post.dislikes.all():
+            post.dislikes.remove(self.request.user)
+        if self.request.user in post.likes.all():
+            post.likes.remove(self.request.user)
+        else:
+            post.likes.add(self.request.user)
+        return Response(status=201)
+
+    @action(detail=True, methods=['put'])
+    def set_dislike(self, request, pk, num_post):
+        post = self.get_object()
+        if self.request.user in post.likes.all():
+            post.likes.remove(self.request.user)
+        if self.request.user in post.dislikes.all():
+            post.dislikes.remove(self.request.user)
+        else:
+            post.dislikes.add(self.request.user)
+        return Response(status=201)
+
+
+class AddCommentsUserPostView(generics.CreateAPIView):
+    queryset = CommentUserPost.objects.all()
+    serializer_class = CommentsCreateUserPostSerializers
+    permission_classes = (IsAuthenticated, )
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user, comment_user_post_id=self.kwargs.get('num_post'))
+
+
+class ListCommentsUserPostView(generics.ListAPIView):
+    serializer_class = CommentsListUserPostSerializers
+
+    def get_queryset(self):
+        return CommentUserPost.objects.filter(comment_user_post_id=self.kwargs.get('num_post'))
+
+
+class RetUpDesCommentsUserPostView(MixedPermission, viewsets.ModelViewSet):
+    queryset = CommentUserPost.objects.all()
+    serializer_class = CommentsRetDesUpUserPostSerializers
+    permission_classes_by_action = {
+        'retrieve': (IsAuthenticatedOrReadOnly,),
+        'update': (IsUser,),
+        'destroy': (IsUser,),
+    }
+    lookup_url_kwarg = 'num_post'

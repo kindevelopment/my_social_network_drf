@@ -75,9 +75,4 @@ class CommentUserPost(Comment):
         verbose_name='Комментарии к посту пользователя',
     )
 
-    def __str__(self):
-        return self.user.username
 
-    class Meta:
-        verbose_name = 'Комментарий пользователя'
-        verbose_name_plural = 'Комментарии пользователей'

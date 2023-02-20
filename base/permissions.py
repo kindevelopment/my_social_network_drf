@@ -15,6 +15,9 @@ class IsUserprofile(IsAuthenticated):
         return obj.id == request.user.id
 
 
+class IsUserInPost
+
+
 class IsUserTeam(IsAuthenticated):
 
     def has_object_permission(self, request, view, obj):

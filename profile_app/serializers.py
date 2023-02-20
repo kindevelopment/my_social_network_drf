@@ -1,5 +1,9 @@
 from rest_framework import serializers
-from .models import User, UserPost, Subscribe
+from .models import (User,
+                     UserPost,
+                     Subscribe,
+                     CommentUserPost,
+                     )
 
 
 class UserSerializers(serializers.ModelSerializer):
@@ -65,3 +69,25 @@ class UserPostRetrieveAndEdit(MixinFieldProfile, serializers.ModelSerializer):
     class Meta:
         model = UserPost
         fields = '__all__'
+
+
+class CommentsCreateUserPostSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = CommentUserPost
+        fields = ('text', )
+
+
+class CommentsListUserPostSerializers(serializers.ModelSerializer):
+    user = UserSerializers()
+
+    class Meta:
+        model = CommentUserPost
+        exclude = ('comment_user_post', )
+
+
+class CommentsRetDesUpUserPostSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = CommentUserPost
+        fields = ('text', )

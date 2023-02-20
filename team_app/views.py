@@ -9,6 +9,7 @@ from .serializers import (ListTeamViewSerializers,
                           ListPostTeamViewSerializers,
                           RetrieveEditUserPostSerializers,
                           EditDestroyViewSerializers, TeamCreateSerializers, AddPostTeamSerializers,
+                          RetrievePostTeamSerializers,
                           )
 from base.classes import MixedPermission
 
@@ -48,7 +49,7 @@ class AddDelFollowingTeamView(viewsets.ModelViewSet):
         return Response(status=201)
 
 
-class TeamEditDestroyView(MixedPermission, viewsets.ModelViewSet):
+class TeamEditRetrieveUpdateDestroyView(MixedPermission, viewsets.ModelViewSet):
     queryset = Team.objects.all()
     serializer_class = EditDestroyViewSerializers
     permission_classes_by_action = {
@@ -86,3 +87,32 @@ class RetrieveEditUserPostView(MixedPermission, viewsets.ModelViewSet):
     }
     lookup_url_kwarg = 'num_post'
 
+
+class AddLikesOrDislikesTeamPostView(viewsets.ModelViewSet):
+    queryset = TeamPost.objects.all()
+    serializer_class = RetrievePostTeamSerializers
+    permission_classes = (IsAuthenticated,)
+    lookup_url_kwarg = 'num_post'
+
+    @action(detail=True, methods=('put',))
+    def set_like(self, request, pk, num_post):
+        post = self.get_object()
+        print(post)
+        if self.request.user in post.dislikes.all():
+            post.dislikes.remove(self.request.user)
+        if self.request.user in post.likes.all():
+            post.likes.remove(self.request.user)
+        else:
+            post.likes.add(self.request.user)
+        return Response(status=201)
+
+    @action(detail=True, methods=['put'])
+    def set_dislike(self, request, pk, num_post):
+        post = self.get_object()
+        if self.request.user in post.likes.all():
+            post.likes.remove(self.request.user)
+        if self.request.user in post.dislikes.all():
+            post.dislikes.remove(self.request.user)
+        else:
+            post.dislikes.add(self.request.user)
+        return Response(status=201)

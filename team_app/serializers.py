@@ -82,6 +82,17 @@ class AddPostTeamSerializers(serializers.ModelSerializer):
 
 class RetrieveEditUserPostSerializers(serializers.ModelSerializer):
     '''Изменение и удаление поста команды'''
+    user = UserSerializers()
+    likes = UserSerializers(many=True)
+    dislikes = UserSerializers(many=True)
+
     class Meta:
         model = TeamPost
         exclude = ('team_post', )
+
+
+class RetrievePostTeamSerializers(serializers.ModelSerializer):
+    '''Выведение детально одного поста'''
+    class Meta:
+        model = TeamPost
+        fields = '__all__'
