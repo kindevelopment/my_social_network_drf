@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'mainwall_app',
 
     'rest_framework',
+    'rest_framework_simplejwt',
     'silk',
 
 ]
@@ -140,9 +141,9 @@ AUTH_USER_MODEL = 'profile_app.User'
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    # ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.BasicAuthentication',

@@ -11,12 +11,13 @@ from .serializers import (ProfileSerializers,
                           ListUserSerializers,
                           ProfileSubscribeSerializers,
                           UserPostAddSerializers,
-                          CommentsCreateUserPostSerializers, CommentsListUserPostSerializers,
+                          CommentsCreateUserPostSerializers,
+                          CommentsListUserPostSerializers,
                           CommentsRetDesUpUserPostSerializers,
                           )
 
 from base.classes import MixedPermission
-from base.permissions import IsUser, IsUserprofile
+from base.permissions import IsUser, IsUserprofile, IsUserInPost
 
 
 class ListProfileView(generics.ListAPIView):
@@ -140,6 +141,6 @@ class RetUpDesCommentsUserPostView(MixedPermission, viewsets.ModelViewSet):
     permission_classes_by_action = {
         'retrieve': (IsAuthenticatedOrReadOnly,),
         'update': (IsUser,),
-        'destroy': (IsUser,),
+        'destroy': (IsUserInPost, ),
     }
-    lookup_url_kwarg = 'num_post'
+    lookup_url_kwarg = 'num_comment'

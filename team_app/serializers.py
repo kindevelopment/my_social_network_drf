@@ -1,5 +1,12 @@
 from rest_framework import serializers
-from .models import Team, TeamPost, Category, Stack
+from .models import (Team,
+                     TeamPost,
+                     Category,
+                     Stack,
+                     CommentTeamPost, Invite,
+                     SubscribersTeam,
+                     )
+
 from profile_app.serializers import UserSerializers
 
 
@@ -26,7 +33,6 @@ class StackSerializers(serializers.ModelSerializer):
 class MixinFieldTeam(serializers.ModelSerializer):
     category = CategorySerializers()
     stack = StackSerializers(many=True)
-    subscribers = UserSerializers(many=True)
 
 
 class ListTeamViewSerializers(MixinFieldTeam, serializers.ModelSerializer):
@@ -52,6 +58,23 @@ class RetrieveTeamViewSerializers(MixinFieldTeam, serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ListSubscribersSerializers(serializers.ModelSerializer):
+    '''Вывод листа подписчиков'''
+    class Meta:
+        model = SubscribersTeam
+        fields = ('id', 'user', 'is_moder', )
+
+
+class DeleteSubscribersSerializers(serializers.ModelSerializer):
+    '''Удаление подписчика команды'''
+    user = UserSerializers()
+    team = TeamPostFieldViewSerializers()
+
+    class Meta:
+        model = SubscribersTeam
+        fields = ('user', 'team', )
+
+
 class EditDestroyViewSerializers(serializers.ModelSerializer):
     '''Изменение данных команды'''
     category = CategorySerializers()
@@ -59,7 +82,7 @@ class EditDestroyViewSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Team
-        exclude = ('user', 'subscribers', )
+        exclude = ('user', )
 
 
 class ListPostTeamViewSerializers(serializers.ModelSerializer):
@@ -96,3 +119,32 @@ class RetrievePostTeamSerializers(serializers.ModelSerializer):
     class Meta:
         model = TeamPost
         fields = '__all__'
+
+
+class CommentsCreateTeamPostSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = CommentTeamPost
+        fields = ('text', )
+
+
+class CommentsListTeamPostSerializers(serializers.ModelSerializer):
+    user = UserSerializers()
+
+    class Meta:
+        model = CommentTeamPost
+        exclude = ('comment_team_post', )
+
+
+class CommentsRetDesUpTeamPostSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = CommentTeamPost
+        fields = ('text', )
+
+
+class CreateInviteSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = Invite
+        fields = ('user', 'team', )

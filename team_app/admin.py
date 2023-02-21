@@ -1,11 +1,16 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import Team, TeamPost, Category, Stack, Invite
+from .models import Team, TeamPost, Category, Stack, Invite, SubscribersTeam
 
 
 class TeamPostInlines(admin.StackedInline):
     model = TeamPost
+    extra = 0
+
+
+class SubscribersTeamAdminInline(admin.StackedInline):
+    model = SubscribersTeam
     extra = 0
 
 
@@ -16,7 +21,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_filter = ('category', 'stack', )
     search_fields = ('title', 'user', )
     readonly_fields = ('get_image', )
-    inlines = (TeamPostInlines, )
+    inlines = (TeamPostInlines, SubscribersTeamAdminInline)
 
     def get_image(self, obj):
         if obj.avatar:
@@ -57,3 +62,11 @@ class StackAdmin(admin.ModelAdmin):
 class InviteAdmin(admin.ModelAdmin):
     list_display = ('user', 'team', 'datetime_push_invite', )
     list_display_links = ('user', )
+
+
+@admin.register(SubscribersTeam)
+class SubscribersTeamAdmin(admin.ModelAdmin):
+    list_display = ('user', 'team', 'is_moder', )
+    list_display_links = ('user', )
+
+

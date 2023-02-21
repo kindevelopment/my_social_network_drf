@@ -27,12 +27,6 @@ class Team(models.Model):
         related_name='all_team_in_stack',
         verbose_name='Стек',
     )
-    subscribers = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        related_name='all_subscribers_team',
-        blank=True,
-        verbose_name='Подписчики команды',
-    )
 
     def __str__(self):
         return self.title
@@ -40,6 +34,19 @@ class Team(models.Model):
     class Meta:
         verbose_name = 'Команда'
         verbose_name_plural = 'Команды'
+
+
+class SubscribersTeam(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='subscribers', verbose_name='Пользователь', on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, related_name='all_users_team', verbose_name='Команда', on_delete=models.CASCADE)
+    is_moder = models.BooleanField('Модератор команды', default=False)
+
+    def __str__(self):
+        return f'{self.user} - {self.team}'
+
+    class Meta:
+        verbose_name = 'Подписчика команды'
+        verbose_name_plural = 'Подписчики команды'
 
 
 class TeamPost(models.Model):
@@ -121,6 +128,8 @@ class Invite(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Команда',
     )
+    permit = models.BooleanField(default=False)
+    process = models.BooleanField(default=True)
     datetime_push_invite = models.DateTimeField('Время отправки', auto_now_add=True)
 
     def __str__(self):

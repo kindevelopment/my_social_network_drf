@@ -31,6 +31,9 @@ class Subscribe(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='user_follow_following', on_delete=models.CASCADE)
     follow = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='follow', verbose_name='Подписки')         # На кого я подписан
 
+    def __str__(self):
+        return self.user.username
+
     class Meta:
         verbose_name = 'Подписки и подписчики'
         verbose_name_plural = 'Подписки и подписчики'
