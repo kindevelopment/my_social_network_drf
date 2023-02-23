@@ -143,8 +143,29 @@ class CommentsRetDesUpTeamPostSerializers(serializers.ModelSerializer):
         fields = ('text', )
 
 
-class CreateInviteSerializers(serializers.ModelSerializer):
+class InviteSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Invite
         fields = ('user', 'team', )
+
+
+class ListInviteTeamSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = Invite
+        fields = '__all__'
+
+
+class RetrieveInviteSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = Invite
+        fields = '__all__'
+
+
+class UpdateInviteSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = Invite
+        exclude = ('user', 'team', )

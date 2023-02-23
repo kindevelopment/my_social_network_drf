@@ -1,6 +1,6 @@
 from rest_framework.permissions import IsAuthenticated
 
-from team_app.models import Team, SubscribersTeam
+from team_app.models import Team, SubscribersTeam, Invite
 
 
 class IsUser(IsAuthenticated):
@@ -30,14 +30,23 @@ class IsUserTeam(IsAuthenticated):
             or SubscribersTeam.objects.filter(user=request.user, team_id=view.kwargs.get('pk')).exists()
 
 
-class IsAuthorTeam(IsAuthenticated):
+class IsAdminTeam(IsAuthenticated):
 
     def has_permission(self, request, view):
         return Team.objects.filter(user=request.user, id=view.kwargs.get('pk')).exists() \
             or SubscribersTeam.objects.filter(user=request.user, team_id=view.kwargs.get('pk'), is_moder=True).exists()
 
 
-class IsAuthorObjTeam(IsAuthenticated):
+class IsAuthorTeam(IsAuthenticated):
 
     def has_object_permission(self, request, view, obj):
-        return obj.user == request.user
+        return Team.objects.filter(user=request.user, id=view.kwargs.get('pk')).exists() \
+            or SubscribersTeam.objects.filter(user=request.user, team_id=view.kwargs.get('pk'), is_moder=True).exists() \
+            or obj.user == request.user
+
+
+class IsInvite(IsAuthenticated):
+    def has_permission(self, request, view):
+        return not(Team.objects.filter(user=request.user, id=view.kwargs.get('pk')).exists() \
+            or SubscribersTeam.objects.filter(user=request.user, team_id=view.kwargs.get('pk')).exists() \
+            or Invite.objects.filter(user=request.user, team_id=view.kwargs.get('pk')).exists())

@@ -21,12 +21,24 @@ from .serializers import (ListTeamViewSerializers,
                           CommentsCreateTeamPostSerializers,
                           CommentsListTeamPostSerializers,
                           CommentsRetDesUpTeamPostSerializers,
-                          CreateInviteSerializers, ListSubscribersSerializers, DeleteSubscribersSerializers,
+                          InviteSerializers,
+                          ListSubscribersSerializers,
+                          DeleteSubscribersSerializers,
+                          ListInviteTeamSerializers,
+                          RetrieveInviteSerializers,
+                          UpdateInviteSerializers,
                           )
 
-from base.classes import MixedPermission
+from base.classes import MixedPermission, MixedSerializer
 
-from base.permissions import IsUser, IsUserTeam, IsUserInPost, IsAuthorTeam, IsAuthorObjTeam
+from base.permissions import (IsUser,
+                              IsUserTeam,
+                              IsUserInPost,
+                              IsAuthorTeam,
+                              IsInvite,
+                              IsAdminTeam,
+
+                              )
 
 
 class ListTeamView(generics.ListAPIView):
@@ -61,7 +73,7 @@ class DelFollowingTeamView(MixedPermission, viewsets.ModelViewSet):
     permission_classes_by_action = {
         'retrieve': (IsUserTeam,),
         'update': (IsAuthorTeam,),
-        'destroy': (IsAuthorObjTeam, ),
+        'destroy': (IsAuthorTeam, ),
     }
     lookup_url_kwarg = 'num_user_fol'
 
@@ -166,14 +178,50 @@ class RetUpDesCommentsTeamPostView(MixedPermission, viewsets.ModelViewSet):
 
 class CreateInviteTeamView(generics.CreateAPIView):
     queryset = Invite.objects.all()
-    serializer_class = CreateInviteSerializers
-    permission_classes = (IsAuthenticated, )
+    serializer_class = InviteSerializers
+    permission_classes = (IsInvite, )
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user, team_id=self.kwargs.get('pk'))
 
 
-# class DelInviteTeamView(generics.DestroyAPIView):
-#     serializer_class = CreateInviteSerializers
-#     permission_classes = (IsAuthenticated, )
+class DelInviteTeamView(generics.DestroyAPIView):
+    queryset = Invite.objects.all()
+    serializer_class = InviteSerializers
+    permission_classes = (IsUser, )
+    lookup_url_kwarg = 'num_invite'
 
+
+class ListInviteTeamView(generics.ListAPIView):
+    queryset = Invite.objects.all()
+    serializer_class = ListInviteTeamSerializers
+    permission_classes = (IsUserTeam, )
+
+
+class RetrieveUpdateInviteTeamView(MixedSerializer, viewsets.ModelViewSet):
+    queryset = Invite.objects.all()
+    serializer_classes_by_action = {
+        'retrieve': RetrieveInviteSerializers,
+        'update': UpdateInviteSerializers,
+    }
+    permission_classes = (IsAdminTeam, )
+    lookup_url_kwarg = 'num_invite'
+
+    def perform_update(self, serializer):
+        serializer.save()
+        if serializer.data['permit']:
+            self.save_invite()
+            self.delete_invite()
+        elif not(serializer.data['process']):
+            self.delete_invite()
+
+    def save_invite(self):
+        user, team = self.get_object().user.id, self.get_object().team.id
+        subs = SubscribersTeam()
+        subs.user_id = user
+        subs.team_id = team
+        subs.save()
+
+    def delete_invite(self):
+        invite = self.get_object()
+        invite.delete()
