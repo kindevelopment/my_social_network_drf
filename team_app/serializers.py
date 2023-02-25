@@ -17,7 +17,7 @@ class CategorySerializers(serializers.ModelSerializer):
         fields = ('title', )
 
 
-class TeamPostFieldViewSerializers(serializers.ModelSerializer):
+class TeamFieldSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Team
@@ -33,6 +33,14 @@ class StackSerializers(serializers.ModelSerializer):
 class MixinFieldTeam(serializers.ModelSerializer):
     category = CategorySerializers()
     stack = StackSerializers(many=True)
+
+
+class AllFollowTeamSerializers(serializers.ModelSerializer):
+    team = TeamFieldSerializers()
+
+    class Meta:
+        model = SubscribersTeam
+        fields = ('team', )
 
 
 class ListTeamViewSerializers(MixinFieldTeam, serializers.ModelSerializer):
@@ -68,7 +76,7 @@ class ListSubscribersSerializers(serializers.ModelSerializer):
 class DeleteSubscribersSerializers(serializers.ModelSerializer):
     '''Удаление подписчика команды'''
     user = UserSerializers()
-    team = TeamPostFieldViewSerializers()
+    team = TeamFieldSerializers()
 
     class Meta:
         model = SubscribersTeam
@@ -89,7 +97,7 @@ class ListPostTeamViewSerializers(serializers.ModelSerializer):
     '''Посты команды'''
     likes = UserSerializers(many=True)
     dislikes = UserSerializers(many=True)
-    team_post = TeamPostFieldViewSerializers()
+    team_post = TeamFieldSerializers()
 
     class Meta:
         model = TeamPost

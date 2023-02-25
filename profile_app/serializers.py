@@ -13,6 +13,15 @@ class UserSerializers(serializers.ModelSerializer):
         fields = ('username', )
 
 
+class AllPostSubscribeSerializers(serializers.ModelSerializer):
+    user = UserSerializers()
+    likes = UserSerializers(many=True)
+    dislikes = UserSerializers(many=True)
+
+    class Meta:
+        model = UserPost
+        exclude = ('id', )
+
 class MixinFieldProfile(serializers.ModelSerializer):
     user = UserSerializers()
     likes = UserSerializers(many=True)

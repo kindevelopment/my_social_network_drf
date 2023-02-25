@@ -50,3 +50,9 @@ class IsInvite(IsAuthenticated):
         return not(Team.objects.filter(user=request.user, id=view.kwargs.get('pk')).exists() \
             or SubscribersTeam.objects.filter(user=request.user, team_id=view.kwargs.get('pk')).exists() \
             or Invite.objects.filter(user=request.user, team_id=view.kwargs.get('pk')).exists())
+
+
+class IsUserMessage(IsAuthenticated):
+
+    def has_object_permission(self, request, view, obj):
+        return obj.user_sender == request.user or obj.user_reciever == request.user

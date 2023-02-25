@@ -18,3 +18,7 @@ class MixedSerializer:
             serializer_class = self.get_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
         return serializer_class(*args, **kwargs)
+
+
+class MixedPermSerial(MixedPermission, MixedSerializer):
+    pass
