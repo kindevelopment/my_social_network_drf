@@ -5,11 +5,9 @@ from profile_app.serializers import UserSerializers
 
 
 class MessageListSerializers(serializers.ModelSerializer):
-    user_sender = UserSerializers()
-    user_reciever = UserSerializers()
     class Meta:
         model = Message
-        exclude = ('text_message', )
+        exclude = ('text_message', 'hide')
 
 
 class MessageRetrieveSerializers(serializers.ModelSerializer):

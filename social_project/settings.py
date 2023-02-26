@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'silk',
     'djoser',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -85,9 +86,13 @@ WSGI_APPLICATION = 'social_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'social',
+        'USER': 'kindevelop',
+        'PASSWORD': 'Forward05',
+        'HOST': '127.0.0.1',
+        'PORT': '5432'
+        },
 }
 
 
@@ -149,6 +154,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
+    'DEFAULT_FILTER_BACKENDS': (
+            'django_filters.rest_framework.DjangoFilterBackend',
+    ),
 }
 
 SIMPLE_JWT = {

@@ -2,7 +2,8 @@ from rest_framework import generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
-
+from django_filters.rest_framework import DjangoFilterBackend
+from .service import ListTeamFilter
 from .models import (Team,
                      TeamPost,
                      CommentTeamPost,
@@ -44,6 +45,8 @@ from base.permissions import (IsUser,
 class ListTeamView(generics.ListAPIView):
     queryset = Team.objects.all()
     serializer_class = ListTeamViewSerializers
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = ListTeamFilter
 
 
 class CreateTeamView(generics.CreateAPIView):
