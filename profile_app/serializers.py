@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.utils.serializer_helpers import BindingDict
+
 from .models import (User,
                      UserPost,
                      Subscribe,
@@ -22,6 +24,7 @@ class AllPostSubscribeSerializers(serializers.ModelSerializer):
         model = UserPost
         exclude = ('id', )
 
+
 class MixinFieldProfile(serializers.ModelSerializer):
     user = UserSerializers()
     likes = UserSerializers(many=True)
@@ -35,28 +38,33 @@ class ListUserSerializers(serializers.ModelSerializer):
         fields = ('id', 'avatar', 'username', 'address')
 
 
-class ProfileSerializers(serializers.ModelSerializer):
+class ProfileSerializers(serializers.BaseSerializer):
+    def to_representation(self, instance):
+        return {key: value for key, value in instance.items()}
+
+
+class ProfileListSubscribeSerializers(serializers.ModelSerializer):
+    subscribe = UserSerializers()
 
     class Meta:
-        model = User
-        fields = ('avatar', 'username', 'first_name', 'last_name', 'email', 'about', 'address', 'phone_num', 'url_github',)
+        model = Subscribe
+        fields = ('subscribe', 'id')
 
 
 class ProfileSubscribeSerializers(serializers.ModelSerializer):
-    followers = UserSerializers(many=True)
-    follow = UserSerializers(many=True)
+    subscribe = UserSerializers()
     user = UserSerializers()
 
     class Meta:
         model = Subscribe
-        fields = ('followers', 'follow', 'user', )
+        fields = '__all__'
 
 
 class ProfileEditSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'about', 'avatar', 'address', 'phone_num', 'url_github', )
+        fields = ('username', 'first_name', 'last_name', 'email', 'about', 'avatar', 'address', 'phone_num', 'url_github', 'hide_fields', )
 
 
 class UserPostListSerializers(MixinFieldProfile, serializers.ModelSerializer):

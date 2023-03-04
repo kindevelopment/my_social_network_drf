@@ -42,11 +42,20 @@ INSTALLED_APPS = [
     'message_app',
     'mainwall_app',
 
-    'rest_framework',
-    'rest_framework_simplejwt',
+
+
+    # Силк для дебага sql
     'silk',
+
+    # Джозер для регистрация и входа пользователей на сайт
     'djoser',
+    'rest_framework',
+    # Симпл-двт для роботы джот токенов
+    'rest_framework_simplejwt',
+
+    # Джанго-фильтр для фильтрации
     'django_filters',
+
 ]
 
 MIDDLEWARE = [
@@ -160,6 +169,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
+
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5), #Время жизни access - токена
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),   #Время жизни refresh - токена
     "ROTATE_REFRESH_TOKENS": False,
@@ -197,6 +207,7 @@ SIMPLE_JWT = {
     "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
+
 }
 
 DJOSER = {
@@ -209,3 +220,4 @@ DJOSER = {
     'TOKEN_MODEL': None,
 
 }
+

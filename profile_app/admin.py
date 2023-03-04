@@ -8,6 +8,7 @@ from .models import User, UserPost, CommentUserPost, Subscribe
 class SubscribeAdminInline(admin.StackedInline):
     model = Subscribe
     extra = 0
+    fk_name = 'user'
 
 
 @admin.register(User)
@@ -34,7 +35,9 @@ class UserPostAdmin(admin.ModelAdmin):
     readonly_fields = ('get_image', )
 
     def get_image(self, obj):
-        return mark_safe(f'<img src={obj.poster.url} width="50" height="60"')
+        if obj.poster:
+            return mark_safe(f'<img src={obj.poster.url} width="50" height="60"')
+        return mark_safe(f'<img src='' width="50" height="60"')
 
     get_image.short_description = 'Постер'
 

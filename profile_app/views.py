@@ -1,5 +1,7 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
+
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 
@@ -14,6 +16,7 @@ from .serializers import (ProfileSerializers,
                           CommentsCreateUserPostSerializers,
                           CommentsListUserPostSerializers,
                           CommentsRetDesUpUserPostSerializers,
+                          ProfileListSubscribeSerializers,
                           )
 
 from base.classes import MixedPermission
@@ -29,11 +32,19 @@ class ProfileView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = ProfileSerializers
 
+    def get_object(self):
+        obj = get_object_or_404(User, id=self.kwargs.get('pk'))
+        self.check_object_permissions(self.request, obj)
+        filed = [str(field) for field in obj.hide_fields if obj.hide_fields[field]]
+        profile = User.objects.values(*filed).get(id=1)
+        return profile
 
-class ProfileSubscribeView(generics.RetrieveAPIView):
-    queryset = Subscribe.objects.all()
-    serializer_class = ProfileSubscribeSerializers
-    lookup_url_kwarg = 'pk'
+
+class ProfileSubscribeView(generics.ListAPIView):
+    serializer_class = ProfileListSubscribeSerializers
+
+    def get_queryset(self):
+        return Subscribe.objects.filter(user_id=self.kwargs.get('pk'))
 
 
 class ProfileSubscribeAddDelView(viewsets.ModelViewSet):
@@ -41,16 +52,27 @@ class ProfileSubscribeAddDelView(viewsets.ModelViewSet):
     serializer_class = ProfileSubscribeSerializers
     permission_classes = (IsAuthenticated, )
 
-    @action(detail=True, methods=['put', ])
+    @action(detail=True, methods=['put'])
     def add_del_follower(self, request, pk):
-        subscribe = self.get_object()
-        user = Subscribe.objects.get(user_id=self.request.user.id)
-        if self.request.user in subscribe.followers.all():
-            subscribe.followers.remove(self.request.user)
-            user.follow.remove(subscribe.user)
-        else:
-            subscribe.followers.add(self.request.user)
+        all_my_subscribers = Subscribe.objects.filter(
+            user_id=self.kwargs.get('pk')).values_list('subscribe', flat=True)
+        if self.request.user.id != self.kwargs.get('pk'):
+            if self.request.user.id in all_my_subscribers:
+                Subscribe.objects.filter(user_id=self.kwargs.get('pk'),
+                                         subscribe=self.request.user).delete()
+            else:
+                Subscribe.objects.create(user_id=self.kwargs.get('pk'),
+                                         subscribe=self.request.user)
         return Response(status=201)
+
+
+class DeleteSubsInUser(MixedPermission, viewsets.ModelViewSet):
+    queryset = Subscribe.objects.all()
+    serializer_class = ProfileListSubscribeSerializers
+    permission_classes_by_action = {
+        'destroy': (IsUser, ),
+    }
+    lookup_url_kwarg = 'num_subs'
 
 
 class ProfileEditView(MixedPermission, viewsets.ModelViewSet):

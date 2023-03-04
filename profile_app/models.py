@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
@@ -17,6 +19,7 @@ class User(AbstractUser):
     address = models.CharField('Адрес проживания', max_length=200, null=True, blank=True)
     phone_num = models.PositiveSmallIntegerField('Номер телефона', null=True, blank=True)
     url_github = models.URLField('Ссылка на свой github', blank=True, null=True)
+    hide_fields = models.JSONField(default=dict)
 
     def __str__(self):
         return self.username
@@ -27,12 +30,14 @@ class User(AbstractUser):
 
 
 class Subscribe(models.Model):
-    followers = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='followers', verbose_name='Подписчики')   # кто подписан на меня
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, related_name='user_follow_following', on_delete=models.CASCADE)
-    follow = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, related_name='follow', verbose_name='Подписки')         # На кого я подписан
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_subs')
+    subscribe = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                  on_delete=models.CASCADE,
+                                  related_name='subscribe_in_user',
+                                  verbose_name='Подписчики')
 
     def __str__(self):
-        return self.user.username
+        return self.user.username + '-' + self.subscribe.username
 
     class Meta:
         verbose_name = 'Подписки и подписчики'
@@ -61,6 +66,7 @@ class UserPost(models.Model):
         blank=True,
         verbose_name='Дизлайки'
     )
+    publish_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.user.username} - {self.title}'

@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.views import APIView
 
@@ -10,6 +11,7 @@ from team_app.serializers import AllFollowTeamSerializers
 
 
 class AllPostSubscribeView(APIView):
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request):
         all_post = get_all_post_subscribers(request)

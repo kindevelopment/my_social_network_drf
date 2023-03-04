@@ -11,6 +11,7 @@ from .views import (ProfileView,
                     AddCommentsUserPostView,
                     ListCommentsUserPostView,
                     RetUpDesCommentsUserPostView,
+                    DeleteSubsInUser,
                     )
 
 urlpatterns = [
@@ -19,8 +20,12 @@ urlpatterns = [
     path('<int:pk>/subscribe/', ProfileSubscribeView.as_view()),
     path('<int:pk>/subscribe/add-del/', ProfileSubscribeAddDelView.as_view({
         'get': 'retrieve',
-        'put': 'add_del_follower'})
-         ),
+        'put': 'add_del_follower', })
+    ),
+    path('<int:pk>/subscribe/del-subs/<int:num_subs>/', DeleteSubsInUser.as_view({
+        'get': 'retrieve',
+        'delete': 'destroy', })
+    ),
     path('<int:pk>/edit/', ProfileEditView.as_view({
         'get': 'retrieve',
         'put': 'update',
@@ -42,5 +47,4 @@ urlpatterns = [
         'put': 'update',
         'delete': 'destroy'})
          ),
-
 ]
