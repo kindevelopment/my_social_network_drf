@@ -96,7 +96,7 @@ WSGI_APPLICATION = 'social_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'social',
+        'NAME': 'new_social',
         'USER': 'kindevelop',
         'PASSWORD': 'Forward05',
         'HOST': '127.0.0.1',
@@ -221,3 +221,4 @@ DJOSER = {
 
 }
 
+AUTHENTICATION_BACKENDS = ['profile_app.backends.ModelBackend']

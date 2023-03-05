@@ -1,12 +1,15 @@
-from datetime import datetime
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from phonenumber_field.modelfields import PhoneNumberField
+from django.utils.translation import gettext_lazy as _
 
 from team_app.models import TeamPost
 
 from comments.models import Comment
+
+from .managers import CustomUserManager
 
 
 def user_directory_path(instance, filename):
@@ -17,9 +20,13 @@ class User(AbstractUser):
     about = models.TextField('О себе', max_length=5000)
     avatar = models.ImageField('Аватарка', upload_to='user/user_avatar/%Y-%m-%d/', null=True, blank=True)
     address = models.CharField('Адрес проживания', max_length=200, null=True, blank=True)
-    phone_num = models.PositiveSmallIntegerField('Номер телефона', null=True, blank=True)
+    phone_num = PhoneNumberField('Телефон', unique=True)
     url_github = models.URLField('Ссылка на свой github', blank=True, null=True)
     hide_fields = models.JSONField(default=dict)
+    email = models.EmailField(_("email address"), unique=True)
+    objects = CustomUserManager()
+    USERNAME_FIELD = 'phone_num'
+    REQUIRED_FIELDS = ['username', 'email']
 
     def __str__(self):
         return self.username
