@@ -1,11 +1,12 @@
 from rest_framework import serializers
 from rest_framework.utils.serializer_helpers import BindingDict
 
-from .models import (User,
-                     UserPost,
-                     Subscribe,
-                     CommentUserPost,
-                     )
+from .models import (
+    User,
+    UserPost,
+    Subscribe,
+    CommentUserPost,
+)
 
 
 class UserSerializers(serializers.ModelSerializer):
@@ -64,7 +65,18 @@ class ProfileEditSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'about', 'avatar', 'address', 'phone_num', 'url_github', 'hide_fields', )
+        fields = (
+            'username',
+            'first_name',
+            'last_name',
+            'email',
+            'about',
+            'avatar',
+            'address',
+            'phone_num',
+            'url_github',
+            'hide_fields',
+        )
 
 
 class UserPostListSerializers(MixinFieldProfile, serializers.ModelSerializer):

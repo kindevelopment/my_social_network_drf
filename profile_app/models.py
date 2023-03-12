@@ -17,7 +17,7 @@ def user_directory_path(instance, filename):
 
 
 class User(AbstractUser):
-    about = models.TextField('О себе', max_length=5000)
+    about = models.TextField('О себе', max_length=5000, null=True, blank=True)
     avatar = models.ImageField('Аватарка', upload_to='user/user_avatar/%Y-%m-%d/', null=True, blank=True)
     address = models.CharField('Адрес проживания', max_length=200, null=True, blank=True)
     phone_num = PhoneNumberField('Телефон', unique=True)
@@ -25,8 +25,8 @@ class User(AbstractUser):
     hide_fields = models.JSONField(default=dict)
     email = models.EmailField(_("email address"), unique=True)
     objects = CustomUserManager()
-    USERNAME_FIELD = 'phone_num'
-    REQUIRED_FIELDS = ['username', 'email']
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email', 'phone_num', ]
 
     def __str__(self):
         return self.username
@@ -38,10 +38,12 @@ class User(AbstractUser):
 
 class Subscribe(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_subs')
-    subscribe = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                  on_delete=models.CASCADE,
-                                  related_name='subscribe_in_user',
-                                  verbose_name='Подписчики')
+    subscribe = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='subscribe_in_user',
+        verbose_name='Подписчики'
+    )
 
     def __str__(self):
         return self.user.username + '-' + self.subscribe.username

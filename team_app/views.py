@@ -4,42 +4,44 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .service import ListTeamFilter
-from .models import (Team,
-                     TeamPost,
-                     CommentTeamPost,
-                     Invite,
-                     SubscribersTeam,
-                     )
+from .models import (
+    Team,
+    TeamPost,
+    CommentTeamPost,
+    Invite,
+    SubscribersTeam,
+)
 
-from .serializers import (ListTeamViewSerializers,
-                          RetrieveTeamViewSerializers,
-                          ListPostTeamViewSerializers,
-                          RetrieveEditUserPostSerializers,
-                          EditDestroyViewSerializers,
-                          TeamCreateSerializers,
-                          AddPostTeamSerializers,
-                          RetrievePostTeamSerializers,
-                          CommentsCreateTeamPostSerializers,
-                          CommentsListTeamPostSerializers,
-                          CommentsRetDesUpTeamPostSerializers,
-                          InviteSerializers,
-                          ListSubscribersSerializers,
-                          DeleteSubscribersSerializers,
-                          ListInviteTeamSerializers,
-                          RetrieveInviteSerializers,
-                          UpdateInviteSerializers,
-                          )
+from .serializers import (
+    ListTeamViewSerializers,
+    RetrieveTeamViewSerializers,
+    ListPostTeamViewSerializers,
+    RetrieveEditUserPostSerializers,
+    EditDestroyViewSerializers,
+    TeamCreateSerializers,
+    AddPostTeamSerializers,
+    RetrievePostTeamSerializers,
+    CommentsCreateTeamPostSerializers,
+    CommentsListTeamPostSerializers,
+    CommentsRetDesUpTeamPostSerializers,
+    InviteSerializers,
+    ListSubscribersSerializers,
+    DeleteSubscribersSerializers,
+    ListInviteTeamSerializers,
+    RetrieveInviteSerializers,
+    UpdateInviteSerializers,
+)
 
 from base.classes import MixedPermission, MixedSerializer
 
-from base.permissions import (IsUser,
-                              IsUserTeam,
-                              IsUserInPost,
-                              IsAuthorTeam,
-                              IsInvite,
-                              IsAdminTeam,
-
-                              )
+from base.permissions import (
+    IsUser,
+    IsUserTeam,
+    IsUserInPost,
+    IsAuthorTeam,
+    IsInvite,
+    IsAdminTeam,
+)
 
 
 class ListTeamView(generics.ListAPIView):
@@ -129,7 +131,6 @@ class AddLikesOrDislikesTeamPostView(viewsets.ModelViewSet):
     @action(detail=True, methods=('put',))
     def set_like(self, request, pk, num_post):
         post = self.get_object()
-        print(post)
         if self.request.user in post.dislikes.all():
             post.dislikes.remove(self.request.user)
         if self.request.user in post.likes.all():
@@ -228,3 +229,4 @@ class RetrieveUpdateInviteTeamView(MixedSerializer, viewsets.ModelViewSet):
     def delete_invite(self):
         invite = self.get_object()
         invite.delete()
+

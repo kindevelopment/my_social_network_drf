@@ -6,18 +6,19 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 from rest_framework.response import Response
 
 from .models import User, UserPost, Subscribe, CommentUserPost
-from .serializers import (ProfileSerializers,
-                          ProfileEditSerializers,
-                          UserPostListSerializers,
-                          UserPostRetrieveAndEdit,
-                          ListUserSerializers,
-                          ProfileSubscribeSerializers,
-                          UserPostAddSerializers,
-                          CommentsCreateUserPostSerializers,
-                          CommentsListUserPostSerializers,
-                          CommentsRetDesUpUserPostSerializers,
-                          ProfileListSubscribeSerializers,
-                          )
+from .serializers import (
+    ProfileSerializers,
+    ProfileEditSerializers,
+    UserPostListSerializers,
+    UserPostRetrieveAndEdit,
+    ListUserSerializers,
+    ProfileSubscribeSerializers,
+    UserPostAddSerializers,
+    CommentsCreateUserPostSerializers,
+    CommentsListUserPostSerializers,
+    CommentsRetDesUpUserPostSerializers,
+    ProfileListSubscribeSerializers,
+)
 
 from base.classes import MixedPermission
 from base.permissions import IsUser, IsUserprofile, IsUserInPost
@@ -36,8 +37,7 @@ class ProfileView(generics.RetrieveAPIView):
         obj = get_object_or_404(User, id=self.kwargs.get('pk'))
         self.check_object_permissions(self.request, obj)
         filed = [str(field) for field in obj.hide_fields if obj.hide_fields[field]]
-        profile = User.objects.values(*filed).get(id=1)
-        return profile
+        return User.objects.values(*filed).get(id=1)
 
 
 class ProfileSubscribeView(generics.ListAPIView):
@@ -55,14 +55,17 @@ class ProfileSubscribeAddDelView(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'])
     def add_del_follower(self, request, pk):
         all_my_subscribers = Subscribe.objects.filter(
-            user_id=self.kwargs.get('pk')).values_list('subscribe', flat=True)
+            user_id=self.kwargs.get('pk'),
+        ).values_list('subscribe', flat=True)
         if self.request.user.id != self.kwargs.get('pk'):
             if self.request.user.id in all_my_subscribers:
-                Subscribe.objects.filter(user_id=self.kwargs.get('pk'),
-                                         subscribe=self.request.user).delete()
+                Subscribe.objects.filter(
+                    user_id=self.kwargs.get('pk'), subscribe=self.request.user
+                ).delete()
             else:
-                Subscribe.objects.create(user_id=self.kwargs.get('pk'),
-                                         subscribe=self.request.user)
+                Subscribe.objects.create(
+                    user_id=self.kwargs.get('pk'), subscribe=self.request.user
+                )
         return Response(status=201)
 
 
@@ -118,9 +121,8 @@ class AddLikesOrDislikesUserPostView(viewsets.ModelViewSet):
     lookup_url_kwarg = 'num_post'
 
     @action(detail=True, methods=('put', ))
-    def set_like(self, request, pk, num_post):
+    def set_like(self, request):
         post = self.get_object()
-        print(post)
         if self.request.user in post.dislikes.all():
             post.dislikes.remove(self.request.user)
         if self.request.user in post.likes.all():

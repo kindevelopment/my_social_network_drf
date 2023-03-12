@@ -3,8 +3,7 @@ from .models import SubscribersTeam, Team
 
 
 def get_all_follow_team(request):
-    all_team = SubscribersTeam.objects.filter(user=request.user)
-    return all_team
+    return SubscribersTeam.objects.filter(user=request.user)
 
 
 class CharFilterInFilter(filters.BaseInFilter, filters.CharFilter):

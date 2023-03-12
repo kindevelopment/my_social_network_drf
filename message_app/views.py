@@ -3,10 +3,11 @@ from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Message
-from .serializers import (MessageListSerializers,
-                          MessageRetrieveSerializers,
-                          MessageCreateSerializers,
-                          )
+from .serializers import (
+    MessageListSerializers,
+    MessageRetrieveSerializers,
+    MessageCreateSerializers,
+)
 
 from base.permissions import IsUserMessage
 
@@ -32,7 +33,13 @@ class RoomMessage(generics.ListAPIView):
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
-        return Message.objects.filter(Q(user_sender=self.request.user) | Q(user_reciever=self.request.user), Q(user_sender=self.kwargs.get('pk')) | Q(user_reciever=self.kwargs.get('pk')), ~Q(hide__contains=self.request.user.id))
+        return Message.objects.filter(
+            Q(user_sender=self.request.user) |
+            Q(user_reciever=self.request.user),
+            Q(user_sender=self.kwargs.get('pk')) |
+            Q(user_reciever=self.kwargs.get('pk')),
+            ~Q(hide__contains=self.request.user.id)
+        )
 
 
 class MessageRetrieveView(viewsets.ModelViewSet):
@@ -42,9 +49,7 @@ class MessageRetrieveView(viewsets.ModelViewSet):
     lookup_url_kwarg = 'pk'
 
     def perform_destroy(self, instance):
-        if self.request.user.id in instance.hide:
-            pass
-        else:
+        if self.request.user.id not in instance.hide:
             instance.hide.append(self.request.user.id)
             instance.save()
             if len(instance.hide) > 1:

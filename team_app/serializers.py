@@ -1,11 +1,12 @@
 from rest_framework import serializers
-from .models import (Team,
-                     TeamPost,
-                     Category,
-                     Stack,
-                     CommentTeamPost, Invite,
-                     SubscribersTeam,
-                     )
+from .models import (
+    Team,
+    TeamPost,
+    Category,
+    Stack,
+    CommentTeamPost, Invite,
+    SubscribersTeam,
+)
 
 from profile_app.serializers import UserSerializers
 
