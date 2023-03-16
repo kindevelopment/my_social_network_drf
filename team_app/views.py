@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -41,6 +42,7 @@ from base.permissions import (
     IsAuthorTeam,
     IsInvite,
     IsAdminTeam,
+    IsUserInPostTeam,
 )
 
 
@@ -49,6 +51,9 @@ class ListTeamView(generics.ListAPIView):
     serializer_class = ListTeamViewSerializers
     filter_backends = (DjangoFilterBackend, )
     filterset_class = ListTeamFilter
+
+    def get_queryset(self):
+        return Team.objects.select_related('category').prefetch_related('stack').all()
 
 
 class CreateTeamView(generics.CreateAPIView):
@@ -62,6 +67,11 @@ class CreateTeamView(generics.CreateAPIView):
 class RetrieveTeamView(generics.RetrieveAPIView):
     queryset = Team.objects.all()
     serializer_class = RetrieveTeamViewSerializers
+
+    def get_object(self):
+        obj = Team.objects.select_related('user', 'category').prefetch_related('stack').get(id=self.kwargs.get('pk'))
+        self.check_object_permissions(self.request, obj)
+        return obj
 
 
 class ListSubscribersView(generics.ListAPIView):
@@ -80,7 +90,11 @@ class DelFollowingTeamView(MixedPermission, viewsets.ModelViewSet):
         'update': (IsAuthorTeam,),
         'destroy': (IsAuthorTeam, ),
     }
-    lookup_url_kwarg = 'num_user_fol'
+
+    def get_object(self):
+        obj = SubscribersTeam.objects.select_related('user', 'team', ).get(id=self.kwargs.get('num_user_fol'))
+        self.check_object_permissions(self.request, obj)
+        return obj
 
 
 class TeamEditRetrieveUpdateDestroyView(MixedPermission, viewsets.ModelViewSet):
@@ -92,12 +106,20 @@ class TeamEditRetrieveUpdateDestroyView(MixedPermission, viewsets.ModelViewSet):
         'destroy': (IsUser,),
     }
 
+    def get_object(self):
+        obj = Team.objects.select_related('category', 'user').prefetch_related('stack').get(id=self.kwargs.get('pk'))
+        self.check_object_permissions(self.request, obj)
+        return obj
+
 
 class ListPostTeamView(generics.ListAPIView):
     serializer_class = ListPostTeamViewSerializers
 
     def get_queryset(self):
-        return TeamPost.objects.filter(team_post_id=self.kwargs.get('pk'))
+        return TeamPost.objects.\
+            select_related('user', 'team_post').\
+            prefetch_related('likes', 'dislikes').\
+            filter(team_post_id=self.kwargs.get('pk'))
 
 
 class AddPostTeamView(MixedPermission, viewsets.ModelViewSet):
@@ -119,14 +141,28 @@ class RetrieveEditUserPostView(MixedPermission, viewsets.ModelViewSet):
         'update': (IsUser,),
         'destroy': (IsUser,),
     }
-    lookup_url_kwarg = 'num_post'
+
+    def get_object(self):
+        obj = TeamPost.objects.\
+            select_related('user', 'team_post').\
+            prefetch_related('likes', 'dislikes').\
+            get(id=self.kwargs.get('num_post'))
+        self.check_object_permissions(self.request, obj)
+        return obj
 
 
 class AddLikesOrDislikesTeamPostView(viewsets.ModelViewSet):
     queryset = TeamPost.objects.all()
     serializer_class = RetrievePostTeamSerializers
     permission_classes = (IsAuthenticated,)
-    lookup_url_kwarg = 'num_post'
+
+    def get_object(self):
+        obj = TeamPost.objects.\
+            select_related('user__username', 'team_post__title').\
+            prefetch_related('likes', 'dislikes').\
+            get(id=self.kwargs.get('num_post'))
+        self.check_object_permissions(self.request, obj)
+        return obj
 
     @action(detail=True, methods=('put',))
     def set_like(self, request, pk, num_post):
@@ -166,16 +202,16 @@ class ListCommentsTeamPostView(generics.ListAPIView):
     serializer_class = CommentsListTeamPostSerializers
 
     def get_queryset(self):
-        return CommentTeamPost.objects.filter(comment_team_post_id=self.kwargs.get('num_post'))
+        return CommentTeamPost.objects.select_related('user', 'comment_team_post').filter(comment_team_post_id=self.kwargs.get('num_post'))
 
 
 class RetUpDesCommentsTeamPostView(MixedPermission, viewsets.ModelViewSet):
-    queryset = CommentTeamPost.objects.all()
+    queryset = CommentTeamPost.objects.select_related('user', 'comment_team_post').all()
     serializer_class = CommentsRetDesUpTeamPostSerializers
     permission_classes_by_action = {
         'retrieve': (IsAuthenticatedOrReadOnly,),
         'update': (IsUser,),
-        'destroy': (IsUserInPost, ),
+        'destroy': (IsUserInPostTeam, ),
     }
     lookup_url_kwarg = 'num_comment'
 
@@ -183,7 +219,7 @@ class RetUpDesCommentsTeamPostView(MixedPermission, viewsets.ModelViewSet):
 class CreateInviteTeamView(generics.CreateAPIView):
     queryset = Invite.objects.all()
     serializer_class = InviteSerializers
-    permission_classes = (IsInvite, )
+    permission_classes = (IsAuthenticated, )
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user, team_id=self.kwargs.get('pk'))
@@ -197,13 +233,13 @@ class DelInviteTeamView(generics.DestroyAPIView):
 
 
 class ListInviteTeamView(generics.ListAPIView):
-    queryset = Invite.objects.all()
+    queryset = Invite.objects.select_related('user', 'team').all()
     serializer_class = ListInviteTeamSerializers
     permission_classes = (IsUserTeam, )
 
 
 class RetrieveUpdateInviteTeamView(MixedSerializer, viewsets.ModelViewSet):
-    queryset = Invite.objects.all()
+    queryset = Invite.objects.select_related('user', 'team').all()
     serializer_classes_by_action = {
         'retrieve': RetrieveInviteSerializers,
         'update': UpdateInviteSerializers,

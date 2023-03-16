@@ -37,8 +37,18 @@ class Team(models.Model):
 
 
 class SubscribersTeam(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='subscribers', verbose_name='Пользователь', on_delete=models.CASCADE)
-    team = models.ForeignKey(Team, related_name='all_users_team', verbose_name='Команда', on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name='subscribers',
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE
+    )
+    team = models.ForeignKey(
+        Team,
+        related_name='all_users_team',
+        verbose_name='Команда',
+        on_delete=models.CASCADE
+    )
     is_moder = models.BooleanField('Модератор команды', default=False)
 
     def __str__(self):

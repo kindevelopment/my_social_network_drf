@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import Team, TeamPost, Category, Stack, Invite, SubscribersTeam
+from .models import Team, TeamPost, Category, Stack, Invite, SubscribersTeam, CommentTeamPost
 
 
 class TeamPostInlines(admin.StackedInline):
@@ -69,4 +69,8 @@ class SubscribersTeamAdmin(admin.ModelAdmin):
     list_display = ('user', 'team', 'is_moder', )
     list_display_links = ('user', )
 
+
+@admin.register(CommentTeamPost)
+class CommentTeamPostAdmin(admin.ModelAdmin):
+    list_display = ('user', 'comment_team_post')
 

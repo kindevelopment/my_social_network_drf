@@ -56,3 +56,9 @@ class IsUserMessage(IsAuthenticated):
 
     def has_object_permission(self, request, view, obj):
         return obj.user_sender == request.user or obj.user_reciever == request.user
+
+
+class IsUserInPostTeam(IsAuthenticated):
+
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user

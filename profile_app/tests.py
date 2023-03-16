@@ -63,3 +63,4 @@ class SubscribeApiTestCase(APITestCase):
         self.client.delete(reverse('del_subs_pk', kwargs={'pk': self.first_user.id, 'num_subs': 2}), format='json')
         self.assertEqual(0, len(self.get_list_subscribe().json()))
 
+

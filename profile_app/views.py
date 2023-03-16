@@ -44,7 +44,7 @@ class ProfileSubscribeView(generics.ListAPIView):
     serializer_class = ProfileListSubscribeSerializers
 
     def get_queryset(self):
-        return Subscribe.objects.filter(user_id=self.kwargs.get('pk'))
+        return Subscribe.objects.select_related('user', 'subscribe').filter(user_id=self.kwargs.get('pk'))
 
 
 class ProfileSubscribeAddDelView(viewsets.ModelViewSet):
@@ -92,7 +92,7 @@ class ListUserPostView(generics.ListAPIView):
     serializer_class = UserPostListSerializers
 
     def get_queryset(self):
-        return UserPost.objects.filter(user_id=self.kwargs.get('pk'))
+        return UserPost.objects.select_related('user').prefetch_related('likes', 'dislikes').filter(user_id=self.kwargs.get('pk'))
 
 
 class UserPostAddView(generics.CreateAPIView):
@@ -156,7 +156,7 @@ class ListCommentsUserPostView(generics.ListAPIView):
     serializer_class = CommentsListUserPostSerializers
 
     def get_queryset(self):
-        return CommentUserPost.objects.filter(comment_user_post_id=self.kwargs.get('num_post'))
+        return CommentUserPost.objects.select_related('user').filter(comment_user_post_id=self.kwargs.get('num_post'))
 
 
 class RetUpDesCommentsUserPostView(MixedPermission, viewsets.ModelViewSet):
