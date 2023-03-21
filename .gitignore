@@ -32,5 +32,6 @@ doc
 home.rst
 make.bat
 Makefile
+.env
 
 doc-dev
